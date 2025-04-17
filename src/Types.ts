@@ -12,6 +12,11 @@ export interface ClientOptions {
         name: string;
         version: string;
     };
+    /**
+     * Force using fallback authentication method
+     * Useful for environments where Puppeteer cannot be installed (e.g. Termux)
+     */
+    useFallbackAuth?: boolean;
 }
 
 // Authentication credentials

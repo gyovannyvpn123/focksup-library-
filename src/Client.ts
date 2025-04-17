@@ -107,6 +107,33 @@ export class FocksupClient extends EventEmitter {
      * Authenticate using Pairing Code
      */
     async authenticateWithPairingCode(): Promise<string> {
+        // Verificăm dacă useFallbackAuth este setat pentru a sări peste autentificarea reală
+        if (this.options.useFallbackAuth) {
+            this.logger.info('Folosesc metoda de autentificare de rezervă pentru cod de asociere (forțat prin opțiuni)!');
+            this.logger.info('Aceasta este doar pentru demonstrație/Termux și nu va funcționa cu WhatsApp real');
+            
+            const fallbackAuth = new FallbackAuth(this.options.logLevel);
+            
+            // Obținem un cod de asociere demo (nu este unul real)
+            const demoCode = "123-456"; // Cod demo pentru Termux
+            this.emit('pairing_code', demoCode);
+            
+            // Așteptăm o simulare de autentificare
+            const demoCredentials = await fallbackAuth.waitForAuthentication();
+            
+            // Salvăm credențialele demo
+            this.credentials = demoCredentials;
+            
+            // Actualizăm starea și emitem evenimentele
+            this.state = 'connected';
+            this.emit('authenticated');
+            this.emit('ready');
+            
+            this.logger.info('Autentificare de rezervă cu cod de asociere completă (doar demo)!');
+            return demoCode;
+        }
+        
+        // Implementare normală pentru sisteme care suportă conexiunea reală
         try {
             const pairingCodeData = await this.connection.requestPairingCode();
             const pairingCode = await generatePairingCode(pairingCodeData);
@@ -126,6 +153,14 @@ export class FocksupClient extends EventEmitter {
             return pairingCode;
         } catch (error) {
             this.logger.error('Pairing code authentication failed:', error);
+            
+            // Dacă autentificarea cu cod de asociere eșuează și avem useFallbackAuth, încercăm metoda de rezervă
+            if (this.options.useFallbackAuth) {
+                this.logger.info('Se încearcă metoda de rezervă după eșecul codului de asociere...');
+                await this.authenticateWithFallback();
+                return "123-456"; // Cod demo
+            }
+            
             this.emit('auth_failure', error);
             throw error;
         }
@@ -140,6 +175,13 @@ export class FocksupClient extends EventEmitter {
      * va încerca să folosească metoda de rezervă
      */
     async authenticateWithPuppeteer(): Promise<void> {
+        // Verificăm dacă useFallbackAuth este setat pentru a sări peste Puppeteer
+        if (this.options.useFallbackAuth) {
+            this.logger.info('Folosesc metoda de autentificare de rezervă (forțat prin opțiuni)!');
+            this.logger.info('Aceasta este doar pentru demonstrație/Termux și nu va funcționa cu WhatsApp real');
+            return this.authenticateWithFallback();
+        }
+        
         try {
             this.logger.info('Inițiez autentificarea cu Puppeteer...');
             this.state = 'authenticating';
