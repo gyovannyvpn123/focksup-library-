@@ -40,8 +40,9 @@ export class WASocket extends EventEmitter {
                 });
                 
                 this.ws.on('close', (code, reason) => {
-                    this.logger.info(`WebSocket connection closed: ${code} - ${reason}`);
-                    this.handleClose(code, reason);
+                    const reasonStr = reason ? reason.toString() : '';
+                    this.logger.info(`WebSocket connection closed: ${code} - ${reasonStr}`);
+                    this.handleClose(code, reasonStr);
                 });
                 
                 this.ws.on('error', (error) => {

@@ -19,7 +19,7 @@ export async function generateQRCode(qrData: string, options: Partial<QRCodeOpti
         const qrOptions = {
             margin: 1,
             scale: 8,
-            errorCorrectionLevel: 'L',
+            errorCorrectionLevel: 'L' as const, // Specify as literal type for TypeScript
             color: {
                 dark: '#000000',
                 light: '#ffffff'

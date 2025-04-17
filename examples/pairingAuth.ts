@@ -31,7 +31,7 @@ const loadSession = () => {
 };
 
 // Save session
-const saveSession = (session) => {
+const saveSession = (session: any) => {
     fs.writeFileSync(SESSION_FILE_PATH, JSON.stringify(session), 'utf8');
     console.log('Session saved to', SESSION_FILE_PATH);
 };
