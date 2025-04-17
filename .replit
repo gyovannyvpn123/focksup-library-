@@ -19,6 +19,10 @@ args = "Focksup Library Demo"
 task = "workflow.run"
 args = "focksup_library_review"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Focksup Message Demo"
+
 [[workflows.workflow]]
 name = "Focksup Library Demo"
 author = "agent"
@@ -46,6 +50,20 @@ task = "packager.installForAll"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "find . -type f | grep -v \"node_modules\" | sort && ls -la && echo \"File structure is complete. Now checking package.json:\" && [ -f package.json ] && cat package.json || echo \"package.json is missing\""
+
+[[workflows.workflow]]
+name = "Focksup Message Demo"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "rm -rf dist && npx tsc && node dist/examples/messageDemo.js"
 
 [deployment]
 run = ["sh", "-c", "rm -rf dist && npm install && npx tsc && node dist/examples/simple.js"]
