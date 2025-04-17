@@ -17,12 +17,36 @@ O bibliotecă puternică Node.js pentru interacțiunea cu WhatsApp Web, care sus
 ## Instalare
 
 ```bash
-npm install focksup-library
+npm install git+https://github.com/gyovannyvpn123/focksup-library-.git
 ```
+
+## Utilizare pe Termux (Android)
+
+Pentru a utiliza biblioteca pe Termux (Android), urmați acești pași:
+
+```bash
+# Instalați Node.js și npm
+pkg install nodejs
+
+# Instalați git
+pkg install git
+
+# Instalați biblioteca Focksup
+npm install git+https://github.com/gyovannyvpn123/focksup-library-.git
+
+# Instalați qrcode-terminal (opțional, pentru afișarea codurilor QR)
+npm install qrcode-terminal
+```
+
+> **Notă pentru Termux**: Puppeteer nu este compatibil cu Termux, așa că biblioteca va folosi în mod automat o metodă de rezervă. Utilizați opțiunea `useFallbackAuth: true` atunci când creați clientul.
+>
+> Exemplu: `const client = new FocksupClient({ useFallbackAuth: true });`
+>
+> Consultați fișierul [examples/termuxBot.js](./examples/termuxBot.js) pentru un exemplu complet.
 
 ## Dependențe sistem (pentru Puppeteer)
 
-Pentru a folosi autentificarea cu Puppeteer (recomandată), asigurați-vă că aveți instalate următoarele dependențe:
+Pentru a folosi autentificarea cu Puppeteer (recomandată pe PC-uri), asigurați-vă că aveți instalate următoarele dependențe:
 
 ```bash
 # Pentru Debian/Ubuntu
@@ -148,6 +172,7 @@ const client = new FocksupClient(options);
 - `maxReconnectAttempts`: Numărul maxim de încercări de reconectare, default: 5
 - `reconnectInterval`: Intervalul de reconectare în ms, default: 3000
 - `restartOnConnectionLost`: Dacă se va încerca reconectarea, default: true
+- `useFallbackAuth`: (boolean) Forțează utilizarea metodei de rezervă (pentru Termux), default: false
 
 #### Metode principale
 
@@ -178,6 +203,52 @@ const client = new FocksupClient(options);
 - `'disconnected'`: Emis când clientul este deconectat
 - `'reconnecting'`: Emis când clientul încearcă să se reconecteze
 - `'reconnected'`: Emis când clientul s-a reconectat cu succes
+
+### Autentificare cu Cod de Asociere
+
+```javascript
+const { FocksupClient } = require('focksup-library');
+
+// Creează un nou client
+const client = new FocksupClient({
+    logLevel: 'info'
+});
+
+// Evenimentul pentru codul de asociere
+client.on('pairing_code', (code) => {
+    console.log('==========================================');
+    console.log(`Cod de asociere: ${code}`);
+    console.log('==========================================');
+    console.log('Introduceți acest cod în aplicația WhatsApp:');
+    console.log('1. Deschideți WhatsApp pe telefonul dvs.');
+    console.log('2. Mergeți la Setări > Dispozitive conectate');
+    console.log('3. Apăsați "Conectare dispozitiv"');
+    console.log('4. Când vi se cere, introduceți codul de asociere de mai sus');
+});
+
+client.on('authenticated', () => {
+    console.log('Autentificat cu succes!');
+});
+
+client.on('ready', () => {
+    console.log('Client pregătit!');
+    // Acum puteți începe să trimiteți mesaje
+    client.sendTextMessage('40712345678@s.whatsapp.net', 'Salut, sunt conectat prin cod de asociere!');
+});
+
+// Pornire client cu cod de asociere
+async function startClient() {
+    try {
+        // Inițiem autentificarea cu cod de asociere
+        await client.authenticateWithPairingCode();
+        console.log('Se așteaptă introducerea codului de asociere...');
+    } catch (error) {
+        console.error('Eroare la autentificare:', error);
+    }
+}
+
+startClient();
+```
 
 ### Autentificare cu Puppeteer și Stocare Sesiune
 
