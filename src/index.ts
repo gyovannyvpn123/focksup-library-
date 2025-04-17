@@ -9,6 +9,10 @@
 // Export all public interfaces and classes
 export { FocksupClient } from './Client';
 export { WAConnection } from './WAConnection';
+export { MessageHandler } from './MessageHandler';
+export { GroupHandler } from './GroupHandler';
+export { MediaHandler } from './MediaHandler';
+export * from './Auth';
 export * from './Types';
 export * from './Constants';
 export * from './Utils';
