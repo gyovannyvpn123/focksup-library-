@@ -1,0 +1,25 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "A powerful Node.js library for WhatsApp Web interaction, supporting QR code and pairing code authentication methods.",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^22.14.1",
+    "@types/node-fetch": "^2.6.12",
+    "@types/qrcode": "^1.5.5",
+    "@types/ws": "^8.18.1",
+    "node-fetch": "^3.3.2",
+    "qrcode": "^1.5.4",
+    "typescript": "^5.8.3",
+    "ws": "^8.18.1"
+  }
+}
