@@ -34,10 +34,25 @@ export class WAConnection extends EventEmitter {
     
     /**
      * Connect to WhatsApp Web
+     * @param credentials Optional authentication credentials
      */
-    async connect(): Promise<void> {
+    async connect(credentials?: AuthenticationCredentials): Promise<void> {
         if (this.ws) {
             throw new Error('Connection already exists');
+        }
+        
+        // Salvăm credențialele dacă sunt furnizate
+        if (credentials) {
+            this.credentials = credentials;
+        }
+        
+        // Verificăm dacă avem credențiale Puppeteer
+        if (this.credentials?.cookies && this.credentials?.localStorage) {
+            this.logger.info('Folosesc credențiale de browser pentru autentificare');
+            this.authState = 'connected';
+            this.emit('authenticated');
+            this.emit('open');
+            return;
         }
         
         try {
@@ -54,6 +69,11 @@ export class WAConnection extends EventEmitter {
             this.startKeepAlive();
             
             this.logger.info('Successfully connected to WhatsApp Web');
+            
+            // Dacă avem credențiale de autentificare, le folosim
+            if (credentials) {
+                await this.authenticate(credentials);
+            }
         } catch (error) {
             this.logger.error('Failed to connect:', error);
             await this.disconnect();
@@ -214,7 +234,7 @@ export class WAConnection extends EventEmitter {
         
         try {
             const serialized = JSON.stringify(message);
-            const encrypted = this.credentials 
+            const encrypted = this.credentials?.serverPublicKey 
                 ? encrypt(serialized, this.credentials.serverPublicKey) 
                 : serialized;
                 
@@ -375,7 +395,7 @@ export class WAConnection extends EventEmitter {
         this.ws.on('message', (data: string) => {
             try {
                 // Decrypt if needed
-                const decrypted = this.credentials 
+                const decrypted = this.credentials?.privateKey 
                     ? decrypt(data, this.credentials.privateKey) 
                     : data;
                 

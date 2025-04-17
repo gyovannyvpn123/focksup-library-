@@ -23,6 +23,10 @@ args = "focksup_library_review"
 task = "workflow.run"
 args = "Focksup Message Demo"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Focksup Demo"
+
 [[workflows.workflow]]
 name = "Focksup Library Demo"
 author = "agent"
@@ -63,7 +67,21 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "rm -rf dist && npx tsc && node dist/examples/messageDemo.js"
+args = "npm install && npx tsc && node examples/messageDemo.js"
+
+[[workflows.workflow]]
+name = "Focksup Demo"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install && npx tsc && node examples/demo.js"
 
 [deployment]
 run = ["sh", "-c", "rm -rf dist && npm install && npx tsc && node dist/examples/simple.js"]

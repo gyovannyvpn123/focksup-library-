@@ -42,11 +42,14 @@ client.on('disconnected', (reason) => {
     console.log('Client was disconnected:', reason);
 });
 
-// Connect and use QR code authentication
+// Connect and use Puppeteer authentication instead of normal QR code
+// This avoids WhatsApp Web restrictions on non-browser connections
 async function startClient() {
     try {
-        await client.connect();
-        await client.authenticateWithQR();
+        console.log('Starting client with Puppeteer authentication...');
+        // Nu mai este nevoie să apelăm client.connect() aici deoarece
+        // authenticateWithPuppeteer() gestionează tot procesul
+        await client.authenticateWithPuppeteer();
     } catch (error) {
         console.error('Failed to start client:', error);
     }

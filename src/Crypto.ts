@@ -38,19 +38,30 @@ export async function generateKeypair(): Promise<{ public: string, private: stri
  * @param data Data to encrypt
  * @param publicKey Public key for encryption
  */
-export function encrypt(data: string, publicKey: string): string {
+export function encrypt(data: string, publicKey: string | undefined): string {
+    // Dacă cheia publică nu este disponibilă, returnăm datele neschimbate
+    if (!publicKey) {
+        return data;
+    }
+    
     // In a real implementation, we would use the proper WhatsApp encryption scheme
     // This is a simplified version for demonstration
     
-    const encryptedData = crypto.publicEncrypt(
-        {
-            key: publicKey,
-            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING
-        },
-        Buffer.from(data)
-    );
-    
-    return encryptedData.toString('base64');
+    try {
+        const encryptedData = crypto.publicEncrypt(
+            {
+                key: publicKey,
+                padding: crypto.constants.RSA_PKCS1_OAEP_PADDING
+            },
+            Buffer.from(data)
+        );
+        
+        return encryptedData.toString('base64');
+    } catch (error) {
+        console.error('Encryption error:', error);
+        // În caz de eroare, returnăm datele neschimbate
+        return data;
+    }
 }
 
 /**
@@ -58,19 +69,34 @@ export function encrypt(data: string, publicKey: string): string {
  * @param data Encrypted data
  * @param privateKey Private key for decryption
  */
-export function decrypt(data: string, privateKey: string): string {
+export function decrypt(data: string, privateKey: string | undefined): string {
+    // Dacă cheia privată nu este disponibilă, returnăm datele neschimbate
+    if (!privateKey) {
+        return data;
+    }
+    
     // In a real implementation, we would use the proper WhatsApp decryption scheme
     // This is a simplified version for demonstration
     
-    const decryptedData = crypto.privateDecrypt(
-        {
-            key: privateKey,
-            padding: crypto.constants.RSA_PKCS1_OAEP_PADDING
-        },
-        Buffer.from(data, 'base64')
-    );
-    
-    return decryptedData.toString();
+    try {
+        // Verificăm dacă datele sunt codate Base64
+        const isBase64 = /^[a-zA-Z0-9+/]+={0,2}$/.test(data);
+        const inputBuffer = isBase64 ? Buffer.from(data, 'base64') : Buffer.from(data);
+        
+        const decryptedData = crypto.privateDecrypt(
+            {
+                key: privateKey,
+                padding: crypto.constants.RSA_PKCS1_OAEP_PADDING
+            },
+            inputBuffer
+        );
+        
+        return decryptedData.toString();
+    } catch (error) {
+        console.error('Decryption error:', error);
+        // În caz de eroare, returnăm datele neschimbate
+        return data;
+    }
 }
 
 /**

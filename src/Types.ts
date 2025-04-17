@@ -16,12 +16,16 @@ export interface ClientOptions {
 
 // Authentication credentials
 export interface AuthenticationCredentials {
-    publicKey: string;
-    privateKey: string;
-    serverPublicKey: string;
+    publicKey?: string;
+    privateKey?: string;
+    serverPublicKey?: string;
     qrCode?: string;
     pairingCode?: string;
     session?: string;
+    // Credențiale Puppeteer pentru autentificare prin browser
+    cookies?: Array<{name: string, value: string, domain: string, path: string}>;
+    localStorage?: {[key: string]: string};
+    userAgent?: string;
 }
 
 // Connection state
